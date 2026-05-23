@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # npm 依存の更新を週次でチェック
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      # マイナー・パッチは束ねて 1 PR に
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions の更新も週次でチェック
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
