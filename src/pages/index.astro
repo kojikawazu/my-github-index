@@ -1,18 +1,37 @@
 ---
-import "../styles/global.css";
+import Layout from "../components/Layout.astro";
+import Header from "../components/Header.astro";
+import RepoCard from "../components/RepoCard.astro";
+import Footer from "../components/Footer.astro";
+import { getDisplayRepos } from "../lib/github";
+
+const USERNAME = "kojikawazu";
+const SITE_TITLE = "My GitHub Index";
+const SITE_SUBTITLE = "自分の GitHub リポジトリを一覧表示・検索できるインデックスサイト";
+
+const repos = await getDisplayRepos(USERNAME);
+const builtAt = new Date();
 ---
 
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My GitHub Index</title>
-  </head>
-  <body class="min-h-screen bg-slate-50 text-slate-900">
-    <main class="mx-auto max-w-3xl px-4 py-12">
-      <h1 class="text-3xl font-bold">My GitHub Index</h1>
-      <p class="mt-2 text-slate-600">セットアップ確認用ページ（Phase 1）</p>
-    </main>
-  </body>
-</html>
+<Layout title={SITE_TITLE} description={SITE_SUBTITLE}>
+  <Header title={SITE_TITLE} subtitle={SITE_SUBTITLE} />
+
+  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    {repos.length === 0 ? (
+      <p class="text-center text-slate-500">表示できるリポジトリがありません。</p>
+    ) : (
+      <>
+        <p class="mb-6 text-sm text-slate-500">{repos.length} repositories</p>
+        <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {repos.map((repo) => (
+            <li class="relative">
+              <RepoCard repo={repo} />
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </main>
+
+  <Footer username={USERNAME} builtAt={builtAt} />
+</Layout>

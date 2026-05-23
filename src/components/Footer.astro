@@ -1,0 +1,39 @@
+---
+interface Props {
+  username: string;
+  builtAt: Date;
+}
+
+const { username, builtAt } = Astro.props;
+
+const profileUrl = `https://github.com/${username}`;
+
+const builtAtISO = builtAt.toISOString();
+const builtAtJST = builtAt.toLocaleString("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+---
+
+<footer class="border-t border-slate-200 bg-white">
+  <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-500 sm:px-6">
+    <p>
+      Last built:
+      <time datetime={builtAtISO} class="font-mono">{builtAtJST} (JST)</time>
+    </p>
+    <p class="mt-1">
+      <a
+        href={profileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-slate-600 hover:text-blue-700 hover:underline"
+      >
+        github.com/{username}
+      </a>
+    </p>
+  </div>
+</footer>
