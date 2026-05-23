@@ -92,6 +92,16 @@ permissions:
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https:; style-src 'self' 'unsafe-inline';">
 ```
 
+## 受容するリスク（Accepted Risks）
+
+セキュリティ監査で検出されたが、本プロジェクトの構成上影響しないものを明示的に記録する。
+
+| 脆弱性 | 影響範囲 | 本プロジェクトへの影響 | 対応 |
+|--------|---------|----------------------|------|
+| Astro `define:vars` XSS（GHSA-j687-52p2-xcff） | `define:vars` を使うコード | **未使用のため影響なし** | Astro 5 のまま運用、6 系の互換性が安定したら upgrade 検討 |
+| Astro server island replay（GHSA-xr5h-phrj-8vxv） | SSR + Server Islands を使うコード | **`output: 'static'` のため影響なし** | 同上 |
+| yaml stack overflow（`yaml-language-server` 経由） | `@astrojs/check` の依存（dev 専用） | **本番ビルド成果物に含まれない**（IDE 補完用ツール） | 上流の `yaml-language-server` 修正待ち |
+
 ## 情報公開ポリシー
 
 - このサイトには **public リポの公開情報のみ** を掲載
