@@ -49,6 +49,7 @@ CI（GitHub Actions）では `secrets.GITHUB_TOKEN` を自動で `env.GITHUB_TOK
 | Topic 名 | 表示名 |
 |----------|--------|
 | `profile` | プロフィール |
+| （未付与） | 追加分（新規・未トリアージ・自動振り分け） |
 | `personal-project` | 個人開発 |
 | `info-tool` | 情報集約用 |
 | `tech-article` | 技術記事 |
@@ -58,7 +59,7 @@ CI（GitHub Actions）では `secrets.GITHUB_TOKEN` を自動で `env.GITHUB_TOK
 | `algorithm` | アルゴリズム |
 | `game` | ゲーム |
 | `pending` | 保留 |
-| （いずれの topic も付いていない場合） | その他 |
+| `other` | その他（明示的に分類対象外と確定） |
 
 複数 topic が付いている場合、上記表の順で最初に一致したものを採用します。
 

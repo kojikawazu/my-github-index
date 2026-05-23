@@ -8,6 +8,7 @@
 
 export type CategoryKey =
   | "profile"
+  | "added"
   | "personal-project"
   | "info-tool"
   | "tech-article"
@@ -26,6 +27,7 @@ export type Category = {
 
 export const CATEGORIES: readonly Category[] = [
   { key: "profile", label: "プロフィール" },
+  { key: "added", label: "追加分" },
   { key: "personal-project", label: "個人開発" },
   { key: "info-tool", label: "情報集約用" },
   { key: "tech-article", label: "技術記事" },
@@ -40,13 +42,14 @@ export const CATEGORIES: readonly Category[] = [
 
 /**
  * topics 配列から主カテゴリを 1 つ決める。
- * CATEGORIES の定義順で走査し、最初に一致したものを採用する。
- * （GitHub Topic の付与順序に依存しない・複数該当時の挙動が決定的）
+ * CATEGORIES の定義順で走査し、最初に一致した topic を採用する。
+ * どの定義済み topic にもマッチしない場合は "added"（追加分）に落とす。
+ * （= 新規リポは自動的に「追加分」セクションに集まり、トリアージ漏れを防ぐ）
  */
 export function pickCategory(topics: readonly string[]): CategoryKey {
   for (const cat of CATEGORIES) {
-    if (cat.key === "other") continue;
+    if (cat.key === "added") continue;
     if (topics.includes(cat.key)) return cat.key;
   }
-  return "other";
+  return "added";
 }
