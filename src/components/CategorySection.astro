@@ -1,0 +1,24 @@
+---
+import type { CategoryGroup } from "../lib/github";
+import RepoCard from "./RepoCard.astro";
+
+interface Props {
+  group: CategoryGroup;
+}
+
+const { group } = Astro.props;
+---
+
+<section class="mb-10 last:mb-0">
+  <h2 class="mb-4 flex items-baseline gap-2 border-b border-slate-200 pb-2">
+    <span class="text-xl font-bold text-slate-900 sm:text-2xl">{group.label}</span>
+    <span class="text-sm text-slate-500">({group.repos.length})</span>
+  </h2>
+  <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {group.repos.map((repo) => (
+      <li class="relative">
+        <RepoCard repo={repo} />
+      </li>
+    ))}
+  </ul>
+</section>

@@ -1,0 +1,34 @@
+---
+import Layout from "../components/Layout.astro";
+import Header from "../components/Header.astro";
+import CategorySection from "../components/CategorySection.astro";
+import Footer from "../components/Footer.astro";
+import { getDisplayRepos, groupByCategory } from "../lib/github";
+
+const USERNAME = "kojikawazu";
+const SITE_TITLE = "My GitHub Index（整備中）";
+const SITE_SUBTITLE = "自分の GitHub リポジトリを一覧表示・検索できるインデックスサイト";
+
+const repos = await getDisplayRepos(USERNAME);
+const groups = groupByCategory(repos);
+const builtAt = new Date();
+---
+
+<Layout title={SITE_TITLE} description={SITE_SUBTITLE}>
+  <Header title={SITE_TITLE} subtitle={SITE_SUBTITLE} />
+
+  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    {repos.length === 0 ? (
+      <p class="text-center text-slate-500">表示できるリポジトリがありません。</p>
+    ) : (
+      <>
+        <p class="mb-6 text-sm text-slate-500">{repos.length} repositories</p>
+        {groups.map((group) => (
+          <CategorySection group={group} />
+        ))}
+      </>
+    )}
+  </main>
+
+  <Footer username={USERNAME} builtAt={builtAt} />
+</Layout>

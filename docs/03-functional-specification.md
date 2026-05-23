@@ -78,16 +78,19 @@ sequenceDiagram
 ┌────────────────────────────────────────────┐
 │  ヘッダー                                   │
 │  - サイトタイトル「My GitHub Index」       │
-│  - サブタイトル（プロジェクトの一言説明）  │
+│  - サブタイトル                            │
 ├────────────────────────────────────────────┤
-│  リポカードリスト                           │
-│  ┌──────────────────────────────────────┐  │
-│  │ リポ名（強調・リンク）                │  │
-│  │ 概要（description, 1〜2 行）         │  │
-│  └──────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────┐  │
-│  │ ...                                   │  │
-│  └──────────────────────────────────────┘  │
+│  ## プロフィール (n)                       │
+│  ┌──────────┐ ┌──────────┐                 │
+│  │ Card     │ │ Card     │ ...             │
+│  └──────────┘ └──────────┘                 │
+├────────────────────────────────────────────┤
+│  ## 個人開発 (n)                           │
+│  ┌──────────┐ ┌──────────┐                 │
+│  │ Card     │ │ Card     │ ...             │
+│  └──────────┘ └──────────┘                 │
+├────────────────────────────────────────────┤
+│  ## 学習 / AI / アルゴリズム / その他 ...  │
 ├────────────────────────────────────────────┤
 │  フッター                                   │
 │  - 最終ビルド時刻                          │
@@ -101,6 +104,7 @@ sequenceDiagram
 |---------------|------|
 | `Layout.astro` | HTML 全体構造・`<head>` メタタグ・全ページ共通 |
 | `Header.astro` | サイトタイトル・サブタイトル表示 |
+| `CategorySection.astro` | 1 カテゴリ分のセクション（見出し + 件数 + カードグリッド） |
 | `RepoCard.astro` | 1 リポの表示（名前・概要・リンク） |
 | `Footer.astro` | 最終ビルド時刻・プロフィールリンク |
 
@@ -132,11 +136,38 @@ function filterRepos(repos: GitHubRepo[]): DisplayRepo[] {
       name: r.name,
       description: r.description ?? '',
       url: r.html_url,
+      category: pickCategory(r.topics),  // 定義済みカテゴリと一致する topic を順次探す
     }));
+}
+```
+
+### カテゴリの決定ロジック
+
+```typescript
+// 定義済みカテゴリ（CATEGORIES）の順で topics を走査し、最初にマッチしたものを採用
+// どれにも一致しなければ "other"（その他）
+function pickCategory(topics: string[]): CategoryKey {
+  for (const cat of CATEGORIES) {
+    if (cat.key === "other") continue;
+    if (topics.includes(cat.key)) return cat.key;
+  }
+  return "other";
+}
+```
+
+### グループ化
+
+```typescript
+// CATEGORIES の順で空でないカテゴリだけ表示
+function groupByCategory(repos: DisplayRepo[]) {
+  return CATEGORIES
+    .map(cat => ({ ...cat, repos: repos.filter(r => r.category === cat.key) }))
+    .filter(g => g.repos.length > 0);
 }
 ```
 
 ### ソート順
 
-- **デフォルト: `updated_at` の降順**（最近更新したリポが上）
-- 表示項目には含めないが、ソートには使う（活発に動いているリポを上に出す意図）
+- **カテゴリ間**: 定義順（プロフィール → 個人開発 → 学習 → AI → アルゴリズム → その他）
+- **カテゴリ内**: `updated_at` の降順（API 取得時の `sort=updated` で確定）
+- `updated_at` は表示項目には含めないが、ソートには使う
