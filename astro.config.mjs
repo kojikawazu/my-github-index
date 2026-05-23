@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/my-github-index',
   output: 'static',
   vite: {
-    plugins: [tailwindcss()],
+    // @tailwindcss/vite の Plugin 型は Astro 同梱 Vite の型と微妙にズレるため any キャスト
+    plugins: [/** @type {any} */ (tailwindcss())],
   },
 });
