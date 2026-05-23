@@ -9,11 +9,14 @@
 export type CategoryKey =
   | "profile"
   | "personal-project"
+  | "info-tool"
   | "tech-article"
   | "learning"
   | "ai"
+  | "ai-experiment"
   | "algorithm"
   | "game"
+  | "pending"
   | "other";
 
 export type Category = {
@@ -24,11 +27,14 @@ export type Category = {
 export const CATEGORIES: readonly Category[] = [
   { key: "profile", label: "プロフィール" },
   { key: "personal-project", label: "個人開発" },
+  { key: "info-tool", label: "情報集約用" },
   { key: "tech-article", label: "技術記事" },
   { key: "learning", label: "学習" },
   { key: "ai", label: "AI" },
+  { key: "ai-experiment", label: "AI検証用" },
   { key: "algorithm", label: "アルゴリズム" },
   { key: "game", label: "ゲーム" },
+  { key: "pending", label: "保留" },
   { key: "other", label: "その他" },
 ] as const;
 

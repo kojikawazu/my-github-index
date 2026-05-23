@@ -50,11 +50,14 @@ CI（GitHub Actions）では `secrets.GITHUB_TOKEN` を自動で `env.GITHUB_TOK
 |----------|--------|
 | `profile` | プロフィール |
 | `personal-project` | 個人開発 |
+| `info-tool` | 情報集約用 |
 | `tech-article` | 技術記事 |
 | `learning` | 学習 |
 | `ai` | AI |
+| `ai-experiment` | AI検証用 |
 | `algorithm` | アルゴリズム |
 | `game` | ゲーム |
+| `pending` | 保留 |
 | （いずれの topic も付いていない場合） | その他 |
 
 複数 topic が付いている場合、上記表の順で最初に一致したものを採用します。
