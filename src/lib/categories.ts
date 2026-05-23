@@ -9,6 +9,7 @@
 export type CategoryKey =
   | "profile"
   | "personal-project"
+  | "tech-article"
   | "learning"
   | "ai"
   | "algorithm"
@@ -22,6 +23,7 @@ export type Category = {
 export const CATEGORIES: readonly Category[] = [
   { key: "profile", label: "プロフィール" },
   { key: "personal-project", label: "個人開発" },
+  { key: "tech-article", label: "技術記事" },
   { key: "learning", label: "学習" },
   { key: "ai", label: "AI" },
   { key: "algorithm", label: "アルゴリズム" },

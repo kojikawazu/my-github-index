@@ -28,11 +28,21 @@ export type CategoryGroup = Category & {
   repos: DisplayRepo[];
 };
 
-const REPO_HEADERS: HeadersInit = {
-  Accept: "application/vnd.github+json",
-  "X-GitHub-Api-Version": "2022-11-28",
-  "User-Agent": "my-github-index-builder",
-};
+function buildHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "my-github-index-builder",
+  };
+  // 認証があれば 60 req/hr → 5000 req/hr に拡張される。
+  // ローカル: GITHUB_TOKEN=$(gh auth token) npm run build
+  // CI: GitHub Actions の secrets.GITHUB_TOKEN を env で渡す
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 /**
  * 指定ユーザーの public リポを全件取得する（ページング対応）。
@@ -45,7 +55,7 @@ async function fetchAllRepos(username: string): Promise<GitHubRepo[]> {
 
   while (true) {
     const url = `${GITHUB_API_BASE}/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&per_page=${perPage}&page=${page}`;
-    const res = await fetch(url, { headers: REPO_HEADERS });
+    const res = await fetch(url, { headers: buildHeaders() });
 
     if (!res.ok) {
       const body = await res.text();

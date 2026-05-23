@@ -32,6 +32,16 @@ npx astro check
 
 ビルド時に GitHub REST API から `kojikawazu` の public リポを取得し、fork と archived を除外して静的 HTML に焼き込みます。
 
+### Rate limit 対策
+
+GitHub REST API は無認証だと 60 req/hr。連続ビルドや `gh` CLI と併用すると枯渇するため、ローカルでは認証トークンを env var で渡すことを推奨：
+
+```bash
+GITHUB_TOKEN=$(gh auth token) npm run build
+```
+
+CI（GitHub Actions）では `secrets.GITHUB_TOKEN` を自動で `env.GITHUB_TOKEN` として渡しているため、追加設定不要で 5000 req/hr が使えます。
+
 ## カテゴリ分類
 
 各リポは GitHub の **Topics** をもとに以下のカテゴリへ振り分けられます。
@@ -40,6 +50,7 @@ npx astro check
 |----------|--------|
 | `profile` | プロフィール |
 | `personal-project` | 個人開発 |
+| `tech-article` | 技術記事 |
 | `learning` | 学習 |
 | `ai` | AI |
 | `algorithm` | アルゴリズム |

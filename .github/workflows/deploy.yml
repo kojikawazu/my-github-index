@@ -38,6 +38,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # 認証ありで GitHub API を叩く（rate limit 60 → 5000 req/hr）
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
