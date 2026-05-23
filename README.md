@@ -54,6 +54,7 @@ CI（GitHub Actions）では `secrets.GITHUB_TOKEN` を自動で `env.GITHUB_TOK
 | `learning` | 学習 |
 | `ai` | AI |
 | `algorithm` | アルゴリズム |
+| `game` | ゲーム |
 | （いずれの topic も付いていない場合） | その他 |
 
 複数 topic が付いている場合、上記表の順で最初に一致したものを採用します。

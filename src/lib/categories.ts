@@ -13,6 +13,7 @@ export type CategoryKey =
   | "learning"
   | "ai"
   | "algorithm"
+  | "game"
   | "other";
 
 export type Category = {
@@ -27,6 +28,7 @@ export const CATEGORIES: readonly Category[] = [
   { key: "learning", label: "学習" },
   { key: "ai", label: "AI" },
   { key: "algorithm", label: "アルゴリズム" },
+  { key: "game", label: "ゲーム" },
   { key: "other", label: "その他" },
 ] as const;
 
