@@ -65,7 +65,19 @@
 | TSK-26 | `kojikawazu.github.io/my-github-index/` で表示確認（PC・モバイル） | 未着手 | 08 |
 | TSK-27 | リポ更新後 → 翌日 01:00 の cron で反映されること確認 | 未着手 | 08 |
 
-### Phase 6（任意・後回し）
+### Phase 6: カテゴリ分類機能（追加要件 F-06）
+
+| ID | タスク | 状態 | 関連仕様書 |
+|----|--------|------|-----------|
+| TSK-31 | `src/lib/categories.ts` 作成（カテゴリ定義 + 表示名） | 未着手 | 02 |
+| TSK-32 | `GitHubRepo` 型に `topics: string[]` 追加 | 未着手 | 03 |
+| TSK-33 | `DisplayRepo` に `category` 追加 + `pickCategory()` 実装 | 未着手 | 03 |
+| TSK-34 | `groupByCategory()` 実装 | 未着手 | 03 |
+| TSK-35 | `CategorySection.astro` 作成 | 未着手 | 03 |
+| TSK-36 | `index.astro` をセクション分割表示にリファクタ | 未着手 | 03 |
+| TSK-37 | 「Topic 付与」運用ガイドを README に追記（`gh repo edit` 例） | 未着手 | - |
+
+### Phase 7（任意・後回し）
 
 | ID | タスク | 状態 | 関連仕様書 |
 |----|--------|------|-----------|

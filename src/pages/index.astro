@@ -1,15 +1,16 @@
 ---
 import Layout from "../components/Layout.astro";
 import Header from "../components/Header.astro";
-import RepoCard from "../components/RepoCard.astro";
+import CategorySection from "../components/CategorySection.astro";
 import Footer from "../components/Footer.astro";
-import { getDisplayRepos } from "../lib/github";
+import { getDisplayRepos, groupByCategory } from "../lib/github";
 
 const USERNAME = "kojikawazu";
 const SITE_TITLE = "My GitHub Index";
 const SITE_SUBTITLE = "自分の GitHub リポジトリを一覧表示・検索できるインデックスサイト";
 
 const repos = await getDisplayRepos(USERNAME);
+const groups = groupByCategory(repos);
 const builtAt = new Date();
 ---
 
@@ -22,13 +23,9 @@ const builtAt = new Date();
     ) : (
       <>
         <p class="mb-6 text-sm text-slate-500">{repos.length} repositories</p>
-        <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {repos.map((repo) => (
-            <li class="relative">
-              <RepoCard repo={repo} />
-            </li>
-          ))}
-        </ul>
+        {groups.map((group) => (
+          <CategorySection group={group} />
+        ))}
       </>
     )}
   </main>

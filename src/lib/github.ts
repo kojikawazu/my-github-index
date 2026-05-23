@@ -3,7 +3,9 @@
  * ビルド時にのみ呼び出される（クライアントには含まれない）。
  */
 
-const GITHUB_API_BASE = 'https://api.github.com';
+import { CATEGORIES, pickCategory, type Category, type CategoryKey } from "./categories";
+
+const GITHUB_API_BASE = "https://api.github.com";
 
 export type GitHubRepo = {
   name: string;
@@ -12,18 +14,24 @@ export type GitHubRepo = {
   fork: boolean;
   archived: boolean;
   updated_at: string;
+  topics: string[];
 };
 
 export type DisplayRepo = {
   name: string;
   description: string;
   url: string;
+  category: CategoryKey;
+};
+
+export type CategoryGroup = Category & {
+  repos: DisplayRepo[];
 };
 
 const REPO_HEADERS: HeadersInit = {
-  Accept: 'application/vnd.github+json',
-  'X-GitHub-Api-Version': '2022-11-28',
-  'User-Agent': 'my-github-index-builder',
+  Accept: "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28",
+  "User-Agent": "my-github-index-builder",
 };
 
 /**
@@ -53,7 +61,7 @@ async function fetchAllRepos(username: string): Promise<GitHubRepo[]> {
     page += 1;
 
     if (page > 50) {
-      throw new Error('Pagination exceeded safety limit (5000 repos)');
+      throw new Error("Pagination exceeded safety limit (5000 repos)");
     }
   }
 
@@ -61,7 +69,7 @@ async function fetchAllRepos(username: string): Promise<GitHubRepo[]> {
 }
 
 /**
- * fork と archived を除外し、表示用 3 フィールドだけに整形する。
+ * fork と archived を除外し、表示用 4 フィールド（name/description/url/category）に整形する。
  * 並び順は API 取得時の sort=updated（updated_at 降順）を維持する。
  */
 function filterAndShape(repos: GitHubRepo[]): DisplayRepo[] {
@@ -69,9 +77,23 @@ function filterAndShape(repos: GitHubRepo[]): DisplayRepo[] {
     .filter((r) => !r.fork && !r.archived)
     .map((r) => ({
       name: r.name,
-      description: r.description ?? '',
+      description: r.description ?? "",
       url: r.html_url,
+      category: pickCategory(r.topics ?? []),
     }));
+}
+
+/**
+ * DisplayRepo[] を CATEGORIES の順でグループ化する。
+ * 空のカテゴリ（リポ 0 件）は結果から除外する。
+ */
+export function groupByCategory(repos: DisplayRepo[]): CategoryGroup[] {
+  return CATEGORIES
+    .map((cat) => ({
+      ...cat,
+      repos: repos.filter((r) => r.category === cat.key),
+    }))
+    .filter((g) => g.repos.length > 0);
 }
 
 /**
