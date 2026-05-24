@@ -50,24 +50,41 @@ graph LR
 | local | 開発・確認 | `http://localhost:4321/my-github-index/`（Astro デフォルト） |
 | production | 公開 | `https://kojikawazu.github.io/my-github-index/` |
 
-### ディレクトリ構成（想定）
+### ディレクトリ構成
+
+フロントエンド（Astro 一式）は `front/` 配下に集約し、ルートはドキュメント・CI 設定・Claude ルールのみとする。
 
 ```
 my-github-index/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          # cron + ビルド + Pages デプロイ
-├── src/
-│   ├── pages/
-│   │   └── index.astro         # トップページ（リポ一覧）
-│   ├── components/
-│   │   └── RepoCard.astro      # リポ 1 件分の表示コンポーネント
-│   └── lib/
-│       └── github.ts           # GitHub API 呼び出し
-├── public/                     # 静的アセット
-├── astro.config.mjs            # base: '/my-github-index/' を設定
-└── package.json
+│                               # （npm 系ステップは working-directory: ./front）
+├── docs/                       # 仕様書（01〜11）
+├── .claude/                    # Claude Code 用ルール
+├── README.md
+└── front/                      # Astro プロジェクトルート
+    ├── src/
+    │   ├── pages/
+    │   │   └── index.astro     # トップページ（リポ一覧）
+    │   ├── components/
+    │   │   ├── Layout.astro
+    │   │   ├── Header.astro
+    │   │   ├── Footer.astro
+    │   │   ├── CategorySection.astro
+    │   │   └── RepoCard.astro
+    │   ├── lib/
+    │   │   ├── github.ts       # GitHub API 呼び出し
+    │   │   └── categories.ts   # カテゴリ定義 + pickCategory()
+    │   └── styles/
+    │       └── global.css
+    ├── public/                 # 静的アセット
+    ├── astro.config.mjs        # base: '/my-github-index' を設定
+    ├── package.json
+    └── tsconfig.json
 ```
+
+**運用ルール**: ローカル開発・ビルドは `cd front` してから `npm` コマンドを実行する。CI 側は `working-directory: ./front` で同じ挙動になる。
 
 ## デプロイ
 
@@ -91,6 +108,6 @@ my-github-index/
 
 ## 将来の拡張（private リポ版との関係）
 
-- 本プロジェクトの `src/lib/github.ts` を「データ取得の抽象化レイヤ」として設計
+- 本プロジェクトの `front/src/lib/github.ts` を「データ取得の抽象化レイヤ」として設計
 - 次回 private 版では同レイヤの実装だけ差し替え（PAT 認証 + private リポ取得）
 - 表示側（`components/`, `pages/`）はそのまま流用可能になるよう疎結合を保つ

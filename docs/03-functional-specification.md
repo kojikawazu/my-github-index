@@ -127,7 +127,7 @@ sequenceDiagram
 ### リポジトリのフィルタリング
 
 ```typescript
-// 擬似コード（実装は src/lib/github.ts）
+// 擬似コード（実装は front/src/lib/github.ts）
 function filterRepos(repos: GitHubRepo[]): DisplayRepo[] {
   return repos
     .filter(r => !r.fork)        // fork を除外
