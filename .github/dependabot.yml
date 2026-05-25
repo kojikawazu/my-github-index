@@ -1,8 +1,8 @@
 version: 2
 updates:
-  # npm 依存の更新を週次でチェック
+  # npm 依存の更新を週次でチェック（Astro プロジェクトは front/ 配下）
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/front"
     schedule:
       interval: "weekly"
       day: "monday"
