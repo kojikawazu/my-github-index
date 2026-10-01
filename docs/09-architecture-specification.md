@@ -34,12 +34,20 @@ graph LR
 
 | レイヤ | 採用技術 | 採用理由 |
 |--------|---------|---------|
-| 静的サイトジェネレータ | **Astro 5.x** | 静的サイト特化・JS フレームワーク非依存・島アーキで部分的にインタラクティブに（Astro 6 は Rolldown + Tailwind v4 統合が未成熟のため当面 5 系を採用） |
+| 静的サイトジェネレータ | **Astro 5.x** | 静的サイト特化・JS フレームワーク非依存・島アーキで部分的にインタラクティブに（Astro 6 は Rolldown + Tailwind v4 統合が未成熟のため当面 5 系を採用。検証記録は「Astro 6 移行の検証記録」参照） |
 | 言語 | TypeScript | 型安全・GitHub API のレスポンスを型で扱える |
 | スタイリング | **Tailwind CSS** | Astro 公式 integration あり・ユーティリティクラスでカード UI を簡潔に書ける |
 | データ取得 | GitHub REST API（無認証） | rate limit 60/hr で十分（ビルド時のみ呼び出すため） |
 | CI / 自動化 | GitHub Actions | GitHub ネイティブ・Pages デプロイと相性が良い |
 | ホスティング | GitHub Pages（プロジェクトページ） | 無料・github.io ドメイン・公開リポと相性 |
+
+### Astro 6 移行の検証記録
+
+| 日付 | 検証バージョン | 結果 | 判断 |
+|---|---|---|---|
+| 2026-10-02 | astro 6.4.8（Dependabot #15） | `npm install` だけではビルド失敗。Astro 6 は Vite 7 を使うが、`@tailwindcss/vite` が hoist された Vite 8 を解決し `Missing field tsconfigPaths` エラー。`npm dedupe` で Vite 7 に統一すればビルド成功・出力 HTML も同一 | **5 系で様子見**。依存更新のたびに Vite が再分裂するリスクがあり、6 系の新機能も不要なため見送り |
+
+再検証の目安: `@tailwindcss/vite` と Astro 6 が同一 Vite メジャーで解決される（dedupe 不要になる）こと。
 
 ## インフラ
 
