@@ -106,6 +106,16 @@ my-github-index/
 - 前回ビルドのコミットを Revert → 自動的に再デプロイ
 - または GitHub Pages の「Actions タブ」から過去の成功 workflow を再実行
 
+### 運用上の注意: cron ワークフローの自動無効化
+
+- GitHub の仕様により、**リポジトリに 60 日間アクティビティ（コミット等）がないと、`schedule` を含むワークフローは自動で無効化される**（状態: `disabled_inactivity`）。
+- 無効化中は cron だけでなく **push / `workflow_dispatch` も含めてワークフロー全体が動かない**ため、サイトが更新されなくなる。
+- `workflow_dispatch` による手動実行はアクティビティとしてカウントされない。
+- 復旧手順:
+  1. `gh workflow enable deploy.yml`（または Actions タブの「Enable workflow」）で再有効化
+  2. `gh workflow run deploy.yml --ref main` で即時再デプロイ
+- 予防: Dependabot PR のマージ等で、60 日以内に `main` へのコミットが発生する状態を保つ。
+
 ## 将来の拡張（private リポ版との関係）
 
 - 本プロジェクトの `front/src/lib/github.ts` を「データ取得の抽象化レイヤ」として設計
