@@ -114,7 +114,9 @@ sequenceDiagram
 - カードレイアウトは `grid` または `flex` でレスポンシブ対応
   - モバイル（〜768px）: 1 カラム
   - PC（768px〜）: 2 〜 3 カラム
-- ダークモード対応は **MVP では見送り**（必要なら後で `dark:` バリアント追加）
+- ダークモード対応: OS の設定（`prefers-color-scheme`）に追従する（Tailwind v4 の `dark:` バリアント）。手動切替トグルは JS が必要になるため設けない
+  - 配色対応: `bg-white` → `slate-800` / `bg-slate-50`（body）→ `slate-900` / `text-slate-900` → `slate-100` / `text-slate-600` → `slate-300` / `text-slate-500` → `slate-400` / `border-slate-200` → `slate-700` / `hover:border-slate-300` → `slate-600` / `hover:text-blue-700` → `blue-400`
+  - 新しく色クラスを追加する場合は、対応する `dark:` クラスも同時に付与する
 
 ### アクセシビリティ
 
