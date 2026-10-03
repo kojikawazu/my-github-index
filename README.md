@@ -50,6 +50,9 @@ npm run check
 
 # ユニットテスト（Vitest）
 npm test
+
+# ビルド成果物の検証（npm run build の後に実行）
+npm run test:dist
 ```
 
 ビルド時に GitHub REST API から `kojikawazu` の public リポを取得し、fork と archived を除外して静的 HTML に焼き込みます。

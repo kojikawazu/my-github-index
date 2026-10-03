@@ -87,9 +87,13 @@ my-github-index/
     │   │   ├── github.ts       # GitHub API 呼び出し
     │   │   ├── github.test.ts  # ユニットテスト（Vitest）
     │   │   ├── categories.ts   # カテゴリ定義 + pickCategory()
-    │   │   └── categories.test.ts
+    │   │   ├── categories.test.ts
+    │   │   ├── csp.ts          # Content Security Policy の定義
+    │   │   └── csp.test.ts
     │   └── styles/
     │       └── global.css
+    ├── tests/
+    │   └── csp-output.test.ts  # ビルド成果物の検証（npm run test:dist）
     ├── public/                 # 静的アセット
     ├── astro.config.mjs        # base: '/my-github-index' を設定
     ├── package.json
@@ -110,6 +114,7 @@ my-github-index/
 2. `npm run check`（astro check: 型エラー 0 件）
 3. `npm test`（Vitest ユニットテスト）
 4. `npm run build`（実 GitHub API を使ったビルド成功確認）
+5. `npm run test:dist`（ビルド成果物の検証: CSP 出力・ポリシー違反がないこと）
 
 - デプロイ（`deploy.yml`）とは**分離**する。cron デプロイにテストを挟むと、API データ起因の失敗で公開が止まるため、品質ゲートは PR 時に集約する。
 - 同一 PR の古い実行は `concurrency` で cancel する。

@@ -115,14 +115,28 @@ GitHub 側の設定で「マージ前に止める」を強制する。
 - `noopener`: 開いた先のページから `window.opener` 経由で元ページを操作されない
 - `noreferrer`: リファラ情報を送信しない
 
-### Content Security Policy（任意）
+### Content Security Policy
 
-- GitHub Pages はカスタム HTTP ヘッダ設定ができないため、CSP は `<meta>` タグでの設定となる
-- 外部 JS をロードしない設計のため CSP は緩めでも実害は少ないが、念のため設定検討
+- GitHub Pages はカスタム HTTP ヘッダを設定できないため、`<meta http-equiv="Content-Security-Policy">` で設定する（`Layout.astro`）。
+- ポリシーの正本は `front/src/lib/csp.ts`。出力 HTML は **JS なし・インラインスタイルなし・自サイト CSS 1 枚のみ**のため、最も厳しく絞る。
 
-```html
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https:; style-src 'self' 'unsafe-inline';">
 ```
+default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self';
+object-src 'none'; base-uri 'self'; form-action 'none'
+```
+
+| ディレクティブ | 値 | 理由 |
+|---|---|---|
+| `script-src` | `'none'` | JS を一切出力しない。XSS の最強の緩和策 |
+| `style-src` | `'self'` | インラインスタイル 0 件のため `'unsafe-inline'` 不要 |
+| `img-src` | `'self'` | 外部画像を読み込まない |
+| `object-src` / `form-action` | `'none'` | プラグイン・フォーム送信なし |
+| `base-uri` | `'self'` | `<base>` 注入による相対 URL 乗っ取りを防ぐ |
+
+- **本番ビルドのみ出力**（`import.meta.env.PROD`）。dev サーバは Vite HMR のスクリプト・インラインスタイルを注入するため、CSP を効かせると開発できなくなる。
+- meta CSP は `frame-ancestors` / `report-uri` / `sandbox` を指定できない（HTTP ヘッダ専用）。
+- `npm run test:dist`（CI の `Dist test`）で、CSP の出力と出力 HTML のポリシー違反（`<script>`・インラインスタイル・外部リソース）がないことを検証する。
+- **JS・外部フォント・外部画像等を追加する場合は `csp.ts` を見直すこと**（そのままでは読み込みがブロックされる）。
 
 ## 受容するリスク（Accepted Risks）
 
