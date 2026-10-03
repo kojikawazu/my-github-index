@@ -44,9 +44,12 @@ describe("dist/index.html の CSP", () => {
     });
 
     it("スタイルシート・画像は自サイト（相対 / ルート相対パス）からのみ読み込む", () => {
-      const srcs = [...html.matchAll(/<(?:link|img)\b[^>]*\b(?:href|src)="([^"]+)"/gi)].map(
-        (m) => m[1],
-      );
+      // リソース取得が発生するものだけが対象（canonical 等のメタ情報 <link> は取得されず CSP の対象外）
+      const fetchedLinks = [
+        ...html.matchAll(/<link\b(?=[^>]*\brel="(?:stylesheet|icon|preload|modulepreload)")[^>]*\bhref="([^"]+)"/gi),
+      ].map((m) => m[1]);
+      const imgs = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gi)].map((m) => m[1]);
+      const srcs = [...fetchedLinks, ...imgs];
       expect(srcs.length).toBeGreaterThan(0);
       for (const src of srcs) {
         expect(src).toMatch(/^\/(?!\/)/);
