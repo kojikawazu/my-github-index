@@ -69,7 +69,7 @@ permissions:
   pages: write         # Pages デプロイに必要
   id-token: write      # OIDC でのデプロイに必要
 
-# ci.yml（PR 時の check / test / build）
+# ci.yml（PR 時の secret scan / check / test / build）
 permissions:
   contents: read       # 読み取りのみ
 ```
@@ -77,6 +77,19 @@ permissions:
 - 不要な権限は付与しない（書き込み権限はデフォルトで OFF にする）
 - third-party action は使用しない（公式 `actions/*` のみ）
 - `ci.yml` は `pull_request` トリガー（`pull_request_target` は使わない）。fork からの PR にはシークレットが渡らず、トークンも読み取り専用になる
+
+### 秘匿ファイルの混入検出（Secret scan）
+
+`.gitignore` は未追跡ファイルにしか効かず（`git add -f` や書き漏れは止められない）、一度 push した秘匿情報は履歴に残り続ける。公開リポジトリでは対処が鍵・トークンの**ローテーションしかない**ため、`ci.yml` の `secret-scan` ジョブで「追跡された時点で落とす」。
+
+| 区分 | パターン |
+|------|---------|
+| 検出（鍵） | `*.key` / `*.pem` / `*.p12` / `*.pfx` / `*.jks` / `*.keystore` / `id_rsa` / `id_ed25519` / `id_dsa` / `credentials.json` / `serviceAccountKey.json` |
+| 検出（環境変数） | `.env` / `.env.*`（`.env.local`, `.env.production` 等） |
+| 除外（誤検知防止） | `*.example` / `*.sample` / `*.template` / `*.dist` / `*.env.d.ts` |
+
+- 導入時点（2026-10）で全履歴を走査済み、実シークレットの混入は 0 件（Issue #19）。
+- 検出対象はファイル名のみ。ファイル内容へのトークン直書きは `/pr-create` の差分スキャンで確認する。
 
 ### 外部リンクの安全な記述
 
