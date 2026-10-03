@@ -38,6 +38,7 @@ graph LR
 | 言語 | TypeScript | 型安全・GitHub API のレスポンスを型で扱える |
 | スタイリング | **Tailwind CSS** | Astro 公式 integration あり・ユーティリティクラスでカード UI を簡潔に書ける |
 | データ取得 | GitHub REST API（無認証） | rate limit 60/hr で十分（ビルド時のみ呼び出すため） |
+| テスト | **Vitest** | Vite ベースで Astro と親和性が高く、純粋な TS ロジックなら設定ファイル不要で動く |
 | CI / 自動化 | GitHub Actions | GitHub ネイティブ・Pages デプロイと相性が良い |
 | ホスティング | GitHub Pages（プロジェクトページ） | 無料・github.io ドメイン・公開リポと相性 |
 
@@ -83,7 +84,9 @@ my-github-index/
     │   │   └── RepoCard.astro
     │   ├── lib/
     │   │   ├── github.ts       # GitHub API 呼び出し
-    │   │   └── categories.ts   # カテゴリ定義 + pickCategory()
+    │   │   ├── github.test.ts  # ユニットテスト（Vitest）
+    │   │   ├── categories.ts   # カテゴリ定義 + pickCategory()
+    │   │   └── categories.test.ts
     │   └── styles/
     │       └── global.css
     ├── public/                 # 静的アセット

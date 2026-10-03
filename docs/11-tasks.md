@@ -89,8 +89,8 @@
 
 | ID | タスク | 状態 | 関連仕様書 |
 |----|--------|------|-----------|
-| TSK-38 | `astro check` の既存エラー解消（`@types/node` 追加、`process` 型未解決） | 未着手 | 09 |
-| TSK-39 | ユニットテスト導入（`pickCategory()` / `groupByCategory()` 等の純粋ロジック） | 未着手 | 08 |
+| TSK-38 | `astro check` の既存エラー解消（`@types/node` 追加、`process` 型未解決） | 完了 | 09 |
+| TSK-39 | ユニットテスト導入（`pickCategory()` / `groupByCategory()` 等の純粋ロジック） | 完了 | 08 |
 | TSK-40 | CI に `check` / テスト実行ステップを追加 | 未着手 | 08, 09 |
 
 ## スケジュール

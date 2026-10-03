@@ -46,7 +46,10 @@ npm run dev
 npm run build
 
 # 型チェック
-npx astro check
+npm run check
+
+# ユニットテスト（Vitest）
+npm test
 ```
 
 ビルド時に GitHub REST API から `kojikawazu` の public リポを取得し、fork と archived を除外して静的 HTML に焼き込みます。
