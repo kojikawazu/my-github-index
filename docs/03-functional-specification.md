@@ -118,6 +118,21 @@ sequenceDiagram
   - 配色対応: `bg-white` → `slate-800` / `bg-slate-50`（body）→ `slate-900` / `text-slate-900` → `slate-100` / `text-slate-600` → `slate-300` / `text-slate-500` → `slate-400` / `border-slate-200` → `slate-700` / `hover:border-slate-300` → `slate-600` / `hover:text-blue-700` → `blue-400`
   - 新しく色クラスを追加する場合は、対応する `dark:` クラスも同時に付与する
 
+### `<head>` メタ情報（OGP / canonical）
+
+SNS・チャットツールで URL を共有した際に**テキストカード**（画像なし）で表示されるよう、`Layout.astro` で以下を出力する。
+
+| タグ | 値 |
+|------|----|
+| `<link rel="canonical">` / `og:url` | `https://kojikawazu.github.io/my-github-index/`（`site` + `base` から生成） |
+| `og:title` / `og:site_name` | `<title>` と同じ |
+| `og:description` | meta description と同じ |
+| `og:type` / `og:locale` | `website` / `ja_JP` |
+| `twitter:card` | `summary`（画像なし） |
+
+- URL は**末尾スラッシュ付き**にする。`/my-github-index`（スラッシュなし）は GitHub Pages が 301 で `/my-github-index/` にリダイレクトするため、正規 URL はリダイレクト後のものとする。
+- `og:image` は設けない（画像ファイルの管理を避ける方針）。追加する場合は 1200×630 を `front/public/` に置き、`twitter:card` を `summary_large_image` に変更する。
+
 ### アクセシビリティ
 
 - リンクには可読なテキスト（リポ名）を必ず含める

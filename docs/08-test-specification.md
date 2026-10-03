@@ -11,7 +11,7 @@
 | ユニット（自動） | `front/src/lib/*.ts` の純粋ロジック・データ整形 | Vitest で網羅。外部 I/O（`fetch`）のみスタブし、ビジネスロジックはモックしない |
 | 型チェック（自動） | `.astro` / `.ts` 全体 | `npm run check`（`astro check`）でエラー 0 件を維持 |
 | ビルド（自動） | サイト全体 | `npm run build` の成功 = 実 API との結合確認を兼ねる |
-| 成果物検証（自動） | `front/dist/index.html` | `npm run test:dist`（ビルド後に実行）。CSP 出力とポリシー違反がないことを確認 |
+| 成果物検証（自動） | `front/dist/index.html` | `npm run test:dist`（ビルド後に実行）。CSP 出力とポリシー違反がないこと、OGP / canonical が正しいことを確認 |
 | 表示確認（手動） | 公開ページ | デプロイ後に PC・モバイルで目視確認 |
 
 - `.astro` コンポーネントは表示のみでロジックを持たないため、ユニットテストの対象外とする。
@@ -70,11 +70,24 @@
 | T-23 | 正常系 | CSP meta とスタイルシートの順序 | CSP が先（meta CSP は後続リソースにのみ効く） |
 | T-24 | 準正常系 | `<script>` | 含まない |
 | T-25 | 準正常系 | `style` 属性 / `<style>` | 含まない |
-| T-26 | 準正常系 | `<link>` / `<img>` の参照先 | すべてルート相対パス（自サイト） |
+| T-26 | 準正常系 | リソース取得が発生する `<link>`（stylesheet / icon / preload）と `<img>` の参照先 | すべてルート相対パス（自サイト）。canonical 等のメタ情報 `<link>` は取得されないため対象外 |
 | T-27 | 異常系 | `'unsafe-inline'` / `'unsafe-eval'` | 含まない |
 | T-28 | 異常系 | `*` / `https:` / `http:` / `data:` | 含まない |
 
-比率: 正常系 9 : 準正常系 + 異常系 19（目安 1:2 を満たす）。
+### ビルド成果物の OGP（`front/tests/ogp-output.test.ts`、`npm run test:dist`）
+
+| ID | 分類 | ケース概要 | 期待結果 |
+|----|------|-----------|---------|
+| T-29 | 正常系 | `og:url` / canonical | `https://kojikawazu.github.io/my-github-index/`（末尾スラッシュ付き） |
+| T-30 | 正常系 | `og:title` / `og:description` | `<title>` / meta description と一致 |
+| T-31 | 正常系 | `og:type` / `og:locale` / `twitter:card` | `website` / `ja_JP` / `summary` |
+| T-32 | 準正常系 | `og:url` の末尾スラッシュ | 欠落していない（301 になる URL でない） |
+| T-33 | 準正常系 | `og:url` のホスト | localhost 等の開発用 URL でない |
+| T-34 | 準正常系 | `og:image` / `twitter:image` | 出力しない（画像なし方針） |
+| T-35 | 異常系 | `og:url` のスキーム | https の絶対 URL |
+| T-36 | 異常系 | OGP 各値 | 空文字でない |
+
+比率: 正常系 12 : 準正常系 + 異常系 24（目安 1:2 を満たす）。
 
 ## カバレッジ目標
 

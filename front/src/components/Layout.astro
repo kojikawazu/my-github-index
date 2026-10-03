@@ -8,6 +8,10 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+// OGP の og:url / canonical は site + base 付きの絶対 URL（Astro.url.pathname は base を含む）。
+// base 直下は末尾スラッシュなしだと GitHub Pages が 301 で "/" 付きへリダイレクトするため "/" を補う。
+const pathname = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonicalUrl = new URL(pathname, Astro.site).href;
 ---
 
 <!doctype html>
@@ -20,6 +24,15 @@ const { title, description } = Astro.props;
     {/* dev サーバは Vite HMR のスクリプト・インラインスタイルを注入するため本番ビルドのみ出力 */}
     {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={CSP} />}
     <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <!-- OGP / Twitter Card（画像なし: テキストカード表示） -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={title} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body class="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased">
     <slot />
