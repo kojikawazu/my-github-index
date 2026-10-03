@@ -56,7 +56,7 @@
 |------|------|
 | A03: Injection（XSS） | Astro デフォルトエスケープ・`set:html` 禁止 |
 | A05: Security Misconfiguration | GitHub Actions の `permissions:` 最小化・Pages 設定の確認 |
-| A06: Vulnerable Components | Dependabot alerts 有効化・lockfile commit・定期的に `npm audit` |
+| A06: Vulnerable Components | Dependabot alerts / security updates 有効化（リポジトリ設定）・lockfile commit・定期的に `npm audit` |
 | A08: Software and Data Integrity | Actions は major version ピン留め（または SHA pinning） |
 | A09: Logging Failures | Actions のログを定期確認、cron 失敗時は通知（要検討） |
 
@@ -142,11 +142,24 @@ object-src 'none'; base-uri 'self'; form-action 'none'
 
 セキュリティ監査で検出されたが、本プロジェクトの構成上影響しないものを明示的に記録する。
 
+**前提**: 出力は `output: 'static'` の HTML 1 枚（JS なし・画像なし）で、サーバー実行環境を持たない。ビルドは CI 上で自分の GitHub リポ情報のみを入力に実行する。
+
+### 2026-10-03 監査（`npm audit`）
+
+`npm audit fix`（semver 範囲内のロックファイル更新）で 16 件 → 4 件に低減。残り 4 件はいずれも修正版が **Astro 7 系（メジャー 2 段）** の依存にしかなく、以下の理由で受容する。
+
 | 脆弱性 | 影響範囲 | 本プロジェクトへの影響 | 対応 |
 |--------|---------|----------------------|------|
-| Astro `define:vars` XSS（GHSA-j687-52p2-xcff） | `define:vars` を使うコード | **未使用のため影響なし** | Astro 5 のまま運用、6 系の互換性が安定したら upgrade 検討（2026-10-02 再検証で見送り。経緯は 09「Astro 6 移行の検証記録」） |
-| Astro server island replay（GHSA-xr5h-phrj-8vxv） | SSR + Server Islands を使うコード | **`output: 'static'` のため影響なし** | 同上 |
-| yaml stack overflow（`yaml-language-server` 経由） | `@astrojs/check` の依存（dev 専用） | **本番ビルド成果物に含まれない**（IDE 補完用ツール） | 上流の `yaml-language-server` 修正待ち |
+| `astro`（critical、10 件の advisory） | 下記の各機能 | **該当機能をすべて未使用のため影響なし** | Astro 5 系で運用継続。メジャー移行は 09「Astro 6 移行の検証記録」の再検証の目安に従う |
+| └ XSS 系: `define:vars`（GHSA-j687-52p2-xcff）/ spread 属性（GHSA-jrpj-wcv7-9fh9, GHSA-f48w-9m4c-m7f5）/ `transition:*`・View Transitions（GHSA-7pw4-f3q4-r2p2, GHSA-4g3v-8h47-v7g6）/ slot 名（GHSA-8hv8-536x-4wqp） | 各ディレクティブ・spread props・名前付き slot を使うコード | `src/` で未使用（grep 確認済み）。加えて CSP `script-src 'none'` で JS 実行自体を遮断 | 同上 |
+| └ SSR 系: Server Islands replay（GHSA-xr5h-phrj-8vxv）/ Host header SSRF（GHSA-2pvr-wf23-7pc7）/ base 除去の認可バイパス（GHSA-376h-93r7-7g6f） | SSR・ミドルウェア・サーバー実行時 | `output: 'static'`・アダプターなしのため該当なし | 同上 |
+| └ AVIF 画像最適化の RCE（GHSA-26w7-cxv4-gfx2） | `astro:assets` で画像を最適化するコード | 画像を一切扱わない | 同上 |
+| `sharp`（high） | 画像処理（`astro:assets`） | 画像処理を実行しない（依存として入るのみ） | 同上 |
+| `http-cache-semantics`（high） | リモート画像・SSR のキャッシュ処理 | 該当処理なし | 同上 |
+| `esbuild`（low） | **Windows** で dev サーバー起動時の任意ファイル読み取り | 開発環境は macOS、CI は Linux。dev サーバーは localhost のみ | 同上 |
+
+- **新たに受容する場合の条件**: 本番出力（静的 HTML）にもビルド入力にも影響しないことを確認し、この表に追記する。
+- **再評価のタイミング**: 該当機能（JS・画像・SSR・`define:vars` 等）を使い始める場合、またはメジャー移行時。
 
 ## 情報公開ポリシー
 
