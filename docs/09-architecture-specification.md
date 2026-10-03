@@ -113,6 +113,7 @@ my-github-index/
 
 - デプロイ（`deploy.yml`）とは**分離**する。cron デプロイにテストを挟むと、API データ起因の失敗で公開が止まるため、品質ゲートは PR 時に集約する。
 - 同一 PR の古い実行は `concurrency` で cancel する。
+- 2 ジョブとも Ruleset の必須ステータスチェックに登録済み（失敗時はマージ不可）。設定詳細は docs/06「リポジトリ設定（Rulesets / Secret scanning）」。
 - `secret-scan` はインデックスを読むだけで数秒で終わるため、`paths` / `paths-ignore` で絞らず常時実行する（ブランチ保護の必須チェックに含めた場合、ワークフローが起動しないと `pending` のままマージ不能になるため）。
 
 ## デプロイ

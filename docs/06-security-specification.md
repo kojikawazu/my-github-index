@@ -78,6 +78,19 @@ permissions:
 - third-party action は使用しない（公式 `actions/*` のみ）
 - `ci.yml` は `pull_request` トリガー（`pull_request_target` は使わない）。fork からの PR にはシークレットが渡らず、トークンも読み取り専用になる
 
+### リポジトリ設定（Rulesets / Secret scanning）
+
+GitHub 側の設定で「マージ前に止める」を強制する。
+
+| 設定 | 内容 |
+|------|------|
+| Ruleset `main`（Active・bypass なし） | ブランチ削除禁止 / force push 禁止 / PR 必須 |
+| └ 必須ステータスチェック | `Secret scan` / `Check / Test / Build`（GitHub Actions）。`strict`（最新化必須）は OFF |
+| Secret scanning / Push protection | 有効。ファイル**内容**のトークン形式を push 時に検出（`secret-scan` ジョブのファイル**名**検出と相互補完） |
+
+- 必須チェック名は `ci.yml` のジョブ `name:` と一致させる。ジョブ名を変更する場合は Ruleset も同時に更新する（不一致だと `pending` のままマージ不能になる）。
+- `ci.yml` を `paths` / `paths-ignore` で絞らない（同上の理由）。
+
 ### 秘匿ファイルの混入検出（Secret scan）
 
 `.gitignore` は未追跡ファイルにしか効かず（`git add -f` や書き漏れは止められない）、一度 push した秘匿情報は履歴に残り続ける。公開リポジトリでは対処が鍵・トークンの**ローテーションしかない**ため、`ci.yml` の `secret-scan` ジョブで「追跡された時点で落とす」。
