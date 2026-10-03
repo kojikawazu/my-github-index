@@ -16,6 +16,30 @@ permissions:
   contents: read
 
 jobs:
+  # 秘匿ファイル（鍵・.env 系）が Git 管理下に入っていないかを検出する。
+  # .gitignore は未追跡ファイルにしか効かず、一度 push した秘匿情報は履歴に残る
+  # （対処はローテーションのみ）ため、追跡された時点で落とす。
+  # git ls-files はインデックスを読むだけで数秒で終わるため、paths 等で絞らず常時実行する。
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Assert no secret files are tracked
+        run: |
+          # 該当なしで grep が exit 1 → pipefail + -e でジョブが落ちるのを防ぐため || true
+          tracked=$(git ls-files \
+            | grep -E '(^|/)(\.env(\..+)?|[^/]+\.(key|pem|p12|pfx|jks|keystore)|id_rsa|id_ed25519|id_dsa|credentials\.json|serviceAccountKey\.json)$' \
+            | grep -vE '\.(example|sample|template|dist)$|\.env\.d\.ts$' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::秘匿ファイルが Git 管理下にあります。.gitignore への追加では履歴から消えないため、鍵・トークンのローテーションが必要になります。"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "OK: 追跡対象に秘匿ファイルはありません"
+
   verify:
     name: Check / Test / Build
     runs-on: ubuntu-latest

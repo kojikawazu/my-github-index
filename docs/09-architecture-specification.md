@@ -100,7 +100,11 @@ my-github-index/
 
 ## CI（PR 時の品質ゲート）
 
-`.github/workflows/ci.yml` で、`main` 向け PR ごとに以下を実行する。
+`.github/workflows/ci.yml` で、`main` 向け PR ごとに以下の 2 ジョブを並列実行する。
+
+**`secret-scan`（Secret scan）**: `git ls-files` で追跡中のファイル名を走査し、鍵・`.env` 系が含まれていたら失敗させる（検出対象は docs/06「秘匿ファイルの混入検出」）。
+
+**`verify`（Check / Test / Build）**:
 
 1. `npm ci`
 2. `npm run check`（astro check: 型エラー 0 件）
@@ -109,6 +113,7 @@ my-github-index/
 
 - デプロイ（`deploy.yml`）とは**分離**する。cron デプロイにテストを挟むと、API データ起因の失敗で公開が止まるため、品質ゲートは PR 時に集約する。
 - 同一 PR の古い実行は `concurrency` で cancel する。
+- `secret-scan` はインデックスを読むだけで数秒で終わるため、`paths` / `paths-ignore` で絞らず常時実行する（ブランチ保護の必須チェックに含めた場合、ワークフローが起動しないと `pending` のままマージ不能になるため）。
 
 ## デプロイ
 

@@ -92,6 +92,7 @@
 | TSK-38 | `astro check` の既存エラー解消（`@types/node` 追加、`process` 型未解決） | 完了 | 09 |
 | TSK-39 | ユニットテスト導入（`pickCategory()` / `groupByCategory()` 等の純粋ロジック） | 完了 | 08 |
 | TSK-40 | CI に `check` / テスト実行ステップを追加 | 完了 | 08, 09 |
+| TSK-41 | CI に Secret scan ジョブを追加（Issue #19） | 完了 | 06, 09 |
 
 ## スケジュール
 
