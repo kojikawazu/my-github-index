@@ -1,0 +1,49 @@
+name: CI
+
+# PR 時の品質ゲート（型チェック・ユニットテスト・ビルド）
+# デプロイ（deploy.yml）とは分離し、cron デプロイがテスト失敗で止まらないようにする
+on:
+  pull_request:
+    branches: [main]
+
+# 同一 PR の古い実行は cancel
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# 最小権限の原則
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Check / Test / Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./front
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: front/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Unit test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # ビルド時に GitHub API を叩くため認証付きで rate limit を緩和
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

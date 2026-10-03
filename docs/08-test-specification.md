@@ -67,4 +67,4 @@
 | テストフレームワーク | Vitest | `npm test`（= `vitest run`）。設定ファイルなし |
 | モック | Vitest 組み込み（`vi.stubGlobal` / `vi.stubEnv`） | `fetch` と環境変数のみ差し替える |
 | 型定義 | `@types/node` | `process.env` の型解決用 |
-| CI 統合 | TSK-40 で対応予定 | PR 時に check / test / build を実行する方針 |
+| CI 統合 | GitHub Actions（`.github/workflows/ci.yml`） | `main` 向け PR ごとに check / test / build を実行。詳細は docs/09「CI（PR 時の品質ゲート）」 |
