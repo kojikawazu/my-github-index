@@ -11,6 +11,7 @@
 | ユニット（自動） | `front/src/lib/*.ts` の純粋ロジック・データ整形 | Vitest で網羅。外部 I/O（`fetch`）のみスタブし、ビジネスロジックはモックしない |
 | 型チェック（自動） | `.astro` / `.ts` 全体 | `npm run check`（`astro check`）でエラー 0 件を維持 |
 | ビルド（自動） | サイト全体 | `npm run build` の成功 = 実 API との結合確認を兼ねる |
+| 成果物検証（自動） | `front/dist/index.html` | `npm run test:dist`（ビルド後に実行）。CSP 出力とポリシー違反がないことを確認 |
 | 表示確認（手動） | 公開ページ | デプロイ後に PC・モバイルで目視確認 |
 
 - `.astro` コンポーネントは表示のみでロジックを持たないため、ユニットテストの対象外とする。
@@ -53,7 +54,27 @@
 | T-17 | 異常系 | HTTP 403 | ステータスを含む例外（= ビルド失敗） |
 | T-18 | 異常系 | 全ページが 100 件で返り続ける | 50 ページで打ち切り例外 |
 
-比率: 正常系 6 : 準正常系 + 異常系 12（目安 1:2 を満たす）。
+### `CSP`（`front/src/lib/csp.test.ts`）
+
+| ID | 分類 | ケース概要 | 期待結果 |
+|----|------|-----------|---------|
+| T-19 | 正常系 | ディレクティブの連結 | `'; '` 区切りの 1 行 |
+| T-20 | 異常系 | `script-src` | `'none'` のまま（JS を許可していない） |
+| T-21 | 異常系 | `'unsafe-inline'` / `'unsafe-eval'` | 含まない |
+
+### ビルド成果物（`front/tests/csp-output.test.ts`、`npm run test:dist`）
+
+| ID | 分類 | ケース概要 | 期待結果 |
+|----|------|-----------|---------|
+| T-22 | 正常系 | CSP meta タグ | `csp.ts` の定義どおり出力 |
+| T-23 | 正常系 | CSP meta とスタイルシートの順序 | CSP が先（meta CSP は後続リソースにのみ効く） |
+| T-24 | 準正常系 | `<script>` | 含まない |
+| T-25 | 準正常系 | `style` 属性 / `<style>` | 含まない |
+| T-26 | 準正常系 | `<link>` / `<img>` の参照先 | すべてルート相対パス（自サイト） |
+| T-27 | 異常系 | `'unsafe-inline'` / `'unsafe-eval'` | 含まない |
+| T-28 | 異常系 | `*` / `https:` / `http:` / `data:` | 含まない |
+
+比率: 正常系 9 : 準正常系 + 異常系 19（目安 1:2 を満たす）。
 
 ## カバレッジ目標
 
@@ -64,7 +85,7 @@
 
 | 項目 | 採用 | 備考 |
 |------|------|------|
-| テストフレームワーク | Vitest | `npm test`（= `vitest run`）。設定ファイルなし |
+| テストフレームワーク | Vitest | `npm test`（= `vitest run src`、ユニット）/ `npm run test:dist`（= `vitest run tests`、ビルド後）。設定ファイルなし |
 | モック | Vitest 組み込み（`vi.stubGlobal` / `vi.stubEnv`） | `fetch` と環境変数のみ差し替える |
 | 型定義 | `@types/node` | `process.env` の型解決用 |
 | CI 統合 | GitHub Actions（`.github/workflows/ci.yml`） | `main` 向け PR ごとに check / test / build を実行。詳細は docs/09「CI（PR 時の品質ゲート）」 |

@@ -71,3 +71,7 @@ jobs:
         env:
           # ビルド時に GitHub API を叩くため認証付きで rate limit を緩和
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ビルド成果物（dist/）の検証（CSP 出力・ポリシー違反がないこと）
+      - name: Dist test
+        run: npm run test:dist
