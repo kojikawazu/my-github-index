@@ -67,8 +67,9 @@ graph LR
 my-github-index/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml          # cron + ビルド + Pages デプロイ
-│                               # （npm 系ステップは working-directory: ./front）
+│       ├── deploy.yml          # cron + ビルド + Pages デプロイ
+│       │                       # （npm 系ステップは working-directory: ./front）
+│       └── ci.yml              # PR 時の check / test / build
 ├── docs/                       # 仕様書（01〜11）
 ├── .claude/                    # Claude Code 用ルール
 ├── README.md
@@ -96,6 +97,18 @@ my-github-index/
 ```
 
 **運用ルール**: ローカル開発・ビルドは `cd front` してから `npm` コマンドを実行する。CI 側は `working-directory: ./front` で同じ挙動になる。
+
+## CI（PR 時の品質ゲート）
+
+`.github/workflows/ci.yml` で、`main` 向け PR ごとに以下を実行する。
+
+1. `npm ci`
+2. `npm run check`（astro check: 型エラー 0 件）
+3. `npm test`（Vitest ユニットテスト）
+4. `npm run build`（実 GitHub API を使ったビルド成功確認）
+
+- デプロイ（`deploy.yml`）とは**分離**する。cron デプロイにテストを挟むと、API データ起因の失敗で公開が止まるため、品質ゲートは PR 時に集約する。
+- 同一 PR の古い実行は `concurrency` で cancel する。
 
 ## デプロイ
 

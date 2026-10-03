@@ -63,14 +63,20 @@
 ### GitHub Actions のセキュリティ設定
 
 ```yaml
+# deploy.yml
 permissions:
   contents: read       # リポ読み取り
   pages: write         # Pages デプロイに必要
   id-token: write      # OIDC でのデプロイに必要
+
+# ci.yml（PR 時の check / test / build）
+permissions:
+  contents: read       # 読み取りのみ
 ```
 
 - 不要な権限は付与しない（書き込み権限はデフォルトで OFF にする）
 - third-party action は使用しない（公式 `actions/*` のみ）
+- `ci.yml` は `pull_request` トリガー（`pull_request_target` は使わない）。fork からの PR にはシークレットが渡らず、トークンも読み取り専用になる
 
 ### 外部リンクの安全な記述
 
